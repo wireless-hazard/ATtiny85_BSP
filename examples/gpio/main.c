@@ -16,6 +16,6 @@ int main()
 		AT85_GPIO_SetLevel(level, AT85_GPIO_PORTB1);
 		AT85_GPIO_TogglePin(AT85_GPIO_PORTB2);
 		AT85_GPIO_SetLevel(!level, AT85_GPIO_PORTB3);
-		_delay_ms(100);
+		_delay_ms(1000);
 	}
 }
