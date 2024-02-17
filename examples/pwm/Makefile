@@ -1,7 +1,7 @@
 FREQ      = 2000000
 DEVICE    = attiny85
 SRC       = main.c
-TARGET    = app
+TARGET    = pwm_gen
 
 all: $(SRC)
 	avr-gcc -g -O2 -fshort-enums -mmcu=$(DEVICE) -DF_CPU=$(FREQ) $(SRC) -o $(TARGET).elf

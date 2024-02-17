@@ -1,1 +1,1 @@
-sudo micronucleus --run app.hex
+sudo micronucleus --run pwm_gen.hex
