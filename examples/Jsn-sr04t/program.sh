@@ -1,0 +1,1 @@
+sudo micronucleus --run sensor.hex

@@ -4,6 +4,10 @@
 #include <avr/io.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
 	AT85_USI_DISABLED        = 0b00U,
 	AT85_USI_THREE_WIRE_MODE = 0b01U,
@@ -149,5 +153,9 @@ static inline void AT85_USI_SendDataRoutine(const uint8_t *data, size_t length, 
 		}
 	}
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /*AT85_USI_H*/

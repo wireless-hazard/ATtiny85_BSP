@@ -4,6 +4,10 @@
 #include <avr/io.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
 	AT85_TMR0_NON_PWM           = 0b00U,
 	AT85_TMR0_PHASE_CORRECT_PWM = 0b01U,
@@ -92,5 +96,9 @@ static inline uint8_t AT85_TMR0_GetCompareValue(at85_tmr0_port_t port)
 {
 	return (port == AT85_TMR0_PORT_OC0A) ? (OCR0A) : (OCR0B);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /*AT85_TMR0_H*/

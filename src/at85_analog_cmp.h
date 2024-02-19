@@ -4,6 +4,10 @@
 #include <avr/io.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
 	AT85_NEG_IN_AIN1 = 0b0000U,
 	AT85_NEG_IN_ADC0 = 0b1000U,
@@ -111,5 +115,9 @@ static inline bool AT85_isDigitalInputEnabled(at85_digital_input_t input)
 {
 	return (bool)((DIDR0 >> input) & 1U);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /*AT85_ANALOG_CMP_H_*/
