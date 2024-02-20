@@ -10,6 +10,12 @@ typedef struct
     AT85::GPIO::port_t output;
 } pin_config_t;
 
+template<AT85::GPIO::port_t input, AT85::GPIO::port_t output>
+void ValidatePins(void)
+{
+    static_assert(input != output,"Input and Output point to the same Port pin");
+}
+
 static inline void ConfigSensorPins(const pin_config_t& config)
 {
     using namespace AT85::GPIO;
@@ -26,7 +32,7 @@ static inline void ConfigSensorPins(const pin_config_t& config)
     SetLevel(false, config.output);
     _delay_us(2U);
     SetLevel(true, config.output);
-    _delay_us(10U-1U);
+    _delay_us(10U);
     SetLevel(false, config.output);
 
     return 0U;
@@ -35,10 +41,12 @@ static inline void ConfigSensorPins(const pin_config_t& config)
 
 int main()
 {
-    const JSN::pin_config_t config {
+    constexpr JSN::pin_config_t config {
         .input  = AT85::GPIO::PORTB_2,
         .output = AT85::GPIO::PORTB_1 
     };
+
+    JSN::ValidatePins<config.input,config.output>();
 
     JSN::ConfigSensorPins(config);
 

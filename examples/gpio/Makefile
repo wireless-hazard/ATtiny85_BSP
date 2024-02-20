@@ -1,10 +1,11 @@
 FREQ      = 2000000
 DEVICE    = attiny85
-SRC       = main.c
+SRC       = main.cpp
 TARGET    = toggle
+AVR_PATH  = /home/avr8-gnu-toolchain-linux_x86_64/bin
 
 all: $(SRC)
-	avr-gcc -g -O2 -fshort-enums -mmcu=$(DEVICE) -DF_CPU=$(FREQ) $(SRC) -o $(TARGET).elf
+	$(AVR_PATH)/avr-g++ -g -O2 -fshort-enums -mmcu=$(DEVICE) -DF_CPU=$(FREQ) $(SRC) -o $(TARGET).elf
 	avr-objcopy -O ihex $(TARGET).elf $(TARGET).hex
 	avr-size --format=avr --mcu=$(DEVICE) $(TARGET).elf
 
