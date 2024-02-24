@@ -15,7 +15,7 @@ extern "C" {
 namespace AT85::GPIO
 {
 
-typedef enum{
+typedef enum : uint8_t {
     PORTB_0 = 0U,
     PORTB_1 = 1U,
     PORTB_2 = 2U,
@@ -24,8 +24,8 @@ typedef enum{
     PORTB_5 = 5U
 } port_t;
 
-typedef enum{
-    INPUT = 0U,
+typedef enum : uint8_t {
+    INPUT  = 0U,
     OUTPUT = 1U
 } direction_t;
 
@@ -46,7 +46,7 @@ static inline void SetLevel(bool level, port_t pin)
 
 static inline bool GetLevel(port_t pin)
 {
-    return (bool)((PORTB >> pin) & 0b00000001U);
+    return (bool)((PINB >> pin) & 0b00000001U);
 }
 
 static inline void TogglePin(port_t pin)
