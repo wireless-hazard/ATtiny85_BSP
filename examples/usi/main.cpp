@@ -4,9 +4,10 @@
 
 int main()
 {
-	AT85_GPIO_SetDirection(AT85_GPIO_OUTPUT, AT85_GPIO_PORTB1); /*DO*/
-	AT85_GPIO_SetDirection(AT85_GPIO_OUTPUT, AT85_GPIO_PORTB2); /*USCLK*/
+	AT85::GPIO::SetDirection(AT85::GPIO::OUTPUT, AT85::GPIO::PORTB_1); /*DO*/
+	AT85::GPIO::SetDirection(AT85::GPIO::OUTPUT, AT85::GPIO::PORTB_2); /*USCLK*/
 
+    //No std::array :(
 	const uint8_t data[5U] = {200U, 100U, 3U, 22U, 8U};
 
 	AT85_USI_SendDataRoutine(data, sizeof(data)/sizeof(uint8_t), AT85_USI_THREE_WIRE_MODE, AT85_USI_EXTERNAL_POSITIVE_EDGE);
