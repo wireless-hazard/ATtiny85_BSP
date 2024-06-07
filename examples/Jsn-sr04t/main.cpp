@@ -3,6 +3,8 @@
 #include <util/delay_basic.h>
 #include <util/delay.h>
 
+volatile uint32_t distance = 0U;
+
 static constexpr float period_us{1000000.0/float{F_CPU}};
 
 namespace JSN
@@ -71,6 +73,6 @@ int main()
     while(true)
     {
         _delay_ms(10U);
-        uint32_t distance = JSN::ReadDistance(config);
+        distance = JSN::ReadDistance(config);
     }
 }
