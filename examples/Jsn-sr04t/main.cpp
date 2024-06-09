@@ -3,9 +3,13 @@
 #include <util/delay_basic.h>
 #include <util/delay.h>
 
-volatile uint32_t distance = 0U;
+volatile uint16_t distance = 0U;
+volatile float actual_distance = 0.0f;
 
 static constexpr float period_us{1000000.0/float{F_CPU}};
+
+static constexpr float nano_seconds{1000000000.0f};
+static constexpr uint16_t uptime_counter_ratio{434}; // Measured value
 
 namespace JSN
 {
@@ -31,7 +35,7 @@ static inline void ConfigSensorPins(const pin_config_t& config)
     SetDirection(INPUT, config.echo);
 }
 
-[[nodiscard]] static inline uint32_t ReadDistance(const pin_config_t& config)
+[[nodiscard]] static inline uint16_t ReadDistance(const pin_config_t& config)
 {
     using AT85::GPIO::SetLevel;
     using namespace AT85::ISR;
@@ -56,6 +60,26 @@ static inline void ConfigSensorPins(const pin_config_t& config)
 }
 }
 
+[[nodiscard]] static float ConvertDistance(uint32_t counter)
+{
+    const uint32_t uptime_ns{uptime_counter_ratio*counter};
+    const uint64_t distance_int{uptime_ns*170U};
+    
+    const float distance = static_cast<float>(distance_int)/nano_seconds;
+
+    return distance;
+}
+
+/**
+ * It will return "true" if the test passes, "false" otherwise
+*/
+[[nodiscard]] static bool TestEqual(float expected, float actual, float accepted_delta)
+{
+    const float positive_difference = ((expected - actual) >= 0.0f) ? (expected - actual) : (actual - expected);
+
+    return (positive_difference <= accepted_delta);
+}
+
 int main()
 {
     constexpr JSN::pin_config_t config {
@@ -74,5 +98,6 @@ int main()
     {
         _delay_ms(10U);
         distance = JSN::ReadDistance(config);
+        actual_distance = ConvertDistance(distance);
     }
 }
