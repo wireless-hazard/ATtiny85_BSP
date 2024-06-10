@@ -28,7 +28,7 @@ if __name__ == "__main__":
   sim.dmanSingleDeviceApplication()
   dev = sim.loadDevice(proc, elffile)
 
-  sigs = ("IRQ.VECTOR9", "PORTB.B1-Out","PORTB.B2-Out")
+  sigs = ("IRQ.VECTOR9", "PORTB.B1-Out","PORTB.B2-Out", "PORTB.B3-Out")
   sim.setVCDDump("result.vcd", sigs)
   
   a7 = XPin(dev, "B2", "L")

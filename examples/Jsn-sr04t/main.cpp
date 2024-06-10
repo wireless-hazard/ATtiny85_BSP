@@ -82,6 +82,9 @@ static inline void ConfigSensorPins(const pin_config_t& config)
 
 int main()
 {
+    // Pin just to mark the correctness of the calculation
+    AT85::GPIO::SetDirection(AT85::GPIO::OUTPUT, AT85::GPIO::PORTB_3);
+
     constexpr JSN::pin_config_t config {
         .echo    = AT85::GPIO::PORTB_2,
         .trigger = AT85::GPIO::PORTB_1 
@@ -99,5 +102,8 @@ int main()
         _delay_ms(10U);
         distance = JSN::ReadDistance(config);
         actual_distance = ConvertDistance(distance);
+
+        bool pass_test = TestEqual(0.25f, actual_distance, 0.05f);
+        AT85::GPIO::SetLevel(pass_test, AT85::GPIO::PORTB_3);
     }
 }
