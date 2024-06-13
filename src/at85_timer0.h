@@ -9,9 +9,10 @@ extern "C" {
 #endif
 
 typedef enum {
-	AT85_TMR0_NON_PWM           = 0b00U,
-	AT85_TMR0_PHASE_CORRECT_PWM = 0b01U,
-	ATM85_TMR0_FAST_PWM         = 0b11U
+	AT85_TMR0_NON_PWM              = 0b00U,
+	AT85_TMR0_PHASE_CORRECT_PWM    = 0b01U,
+	AT85_TMR0_CLEAR_TIMER_ON_MATCH = 0b10U,
+	ATM85_TMR0_FAST_PWM            = 0b11U
 } at85_wave_gen_mode_t;
 
 typedef enum {
@@ -57,7 +58,7 @@ typedef enum {
 } at85_tmr0_port_t;
 
 
-static inline void AT85_TMR0_SetCompareOutputMode(at85_wave_gen_mode_t mode)
+static inline void AT85_TMR0_SetWaveGenerationMode(at85_wave_gen_mode_t mode)
 {
 	TCCR0A = ((uint8_t)mode) | (TCCR0A & (0b11110000U));
 }
@@ -69,7 +70,7 @@ static inline at85_wave_gen_mode_t AT85_TMR0_GetWaveGenerationMode(void)
 
 static inline void AT85_TMR0_PWM_SetPortOperationMode(at85_port_operation_t port_OC0A, at85_port_operation_t port_OC0B)
 {
-	TCCR0A = ((port_OC0A._raw_value << 6U) | (port_OC0B._raw_value << 4U)) | (TCCR0A & (0b11110000U));
+	TCCR0A = ((port_OC0A._raw_value << 6U) | (port_OC0B._raw_value << 4U)) | (TCCR0A & (0b00001111U));
 }
 
 static inline uint8_t AT85_TMR0_PWM_GetRawPortOperationMode(at85_tmr0_port_t port)

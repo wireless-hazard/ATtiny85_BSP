@@ -7,7 +7,7 @@ int main()
 {
     AT85::GPIO::SetDirection(AT85::GPIO::OUTPUT, AT85::GPIO::PORTB_0);
     AT85::GPIO::SetDirection(AT85::GPIO::OUTPUT, AT85::GPIO::PORTB_1);
-    AT85_TMR0_SetCompareOutputMode(AT85_TMR0_NON_PWM);
+    AT85_TMR0_SetWaveGenerationMode(AT85_TMR0_NON_PWM);
 
     at85_port_operation_t port_OC0A = {.non_pwm = AT85_TOGGLE_ON_MATCH};
     at85_port_operation_t port_OC0B = {.non_pwm = AT85_TOGGLE_ON_MATCH};

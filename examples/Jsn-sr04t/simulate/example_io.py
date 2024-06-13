@@ -28,7 +28,7 @@ if __name__ == "__main__":
   sim.dmanSingleDeviceApplication()
   dev = sim.loadDevice(proc, elffile)
 
-  sigs = ("IRQ.VECTOR9", "PORTB.B1-Out","PORTB.B2-Out", "PORTB.B3-Out")
+  sigs = ("IRQ.VECTOR9", "PORTB.B0-Out", "PORTB.B1-Out","PORTB.B2-Out", "PORTB.B3-Out")
   sim.setVCDDump("result.vcd", sigs)
   
   a7 = XPin(dev, "B2", "L")
@@ -44,12 +44,7 @@ if __name__ == "__main__":
     sim.doRun(sim.getCurrentTime() + 200000)
     counter = sim.getWordByName(dev, "distance")
     print(f"Counter: {counter}")
-    #print(f"Rate between time on and count: {uptime/counter}")
-    uptime_calc_ns = (434*counter)
-    #distance = (uptime_calc_ns*340)/(2*(1000000000))
-    distance = sim.getWordByName(dev, "actual_distance")
-    print(f"Distance: {distance}")
-  
+
   sim.dmanStop()  
 
   del dev
