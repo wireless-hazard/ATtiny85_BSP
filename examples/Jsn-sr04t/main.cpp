@@ -3,7 +3,7 @@
 #include <util/delay_basic.h>
 #include <util/delay.h>
 
-volatile float distance = 0.0f;
+volatile float distance{0.0f};
 
 static constexpr float period_us{1000000.0/float{F_CPU}};
 
@@ -22,7 +22,7 @@ typedef struct
 template<AT85::GPIO::port_t echo, AT85::GPIO::port_t trigger>
 void ValidatePins(void)
 {
-    static_assert(echo != trigger,"Input and Output point to the same Port pin");
+    static_assert(echo != trigger,"Echo and Trigger point to the same Port pin");
 }
 
 static inline void ConfigSensorPins(const pin_config_t& config)
@@ -77,49 +77,73 @@ static inline void ConfigSensorPins(const pin_config_t& config)
     return (positive_difference <= accepted_delta);
 }
 
+namespace GPIO
+{
+static void ProduceAlertSignal(float current_distance, AT85::GPIO::port_t port)
+{
+    constexpr uint8_t delay_per_cycle{50};
+    uint8_t number_of_rounds{0};
+
+    if ((current_distance >= 0) && (current_distance < 0.10))
+    {
+        number_of_rounds = 5; //
+    }
+    else if ((current_distance >= 0.10) && (current_distance < 0.15))
+    {
+        number_of_rounds = 10;
+    }
+    else if ((current_distance >= 0.15) && (current_distance < 0.20))
+    {
+        number_of_rounds = 15;
+    }
+    else if ((current_distance >= 0.20) && (current_distance < 0.25))
+    {
+        number_of_rounds = 20;
+    }
+    else
+    {
+        number_of_rounds = 25;
+    }
+
+    AT85::GPIO::SetLevel(true, port);
+    for(uint8_t current_round = 0U; current_round < number_of_rounds; current_round++)
+    {
+        _delay_ms(delay_per_cycle);
+    }
+
+    AT85::GPIO::SetLevel(false, port);
+    for(uint8_t current_round = 0U; current_round < number_of_rounds; current_round++)
+    {
+        _delay_ms(delay_per_cycle);
+    }
+
+    return;
+}
+}
+
 int main()
 {
-    // Configures OC0A
-    AT85::GPIO::SetDirection(AT85::GPIO::OUTPUT, AT85::GPIO::PORTB_0);
-
-    // Pin just to mark the correctness of the calculation
+    // Pin outputing the Alert Signal 
+    // distance between device and object
     AT85::GPIO::SetDirection(AT85::GPIO::OUTPUT, AT85::GPIO::PORTB_3);
 
-    // Configures the PWM generation on OC0A (aka PORTB0)
-    AT85_TMR0_SetWaveGenerationMode(AT85_TMR0_CLEAR_TIMER_ON_MATCH);
-
-    at85_port_operation_t port_OC0A = {.non_pwm = AT85_TOGGLE_ON_MATCH};
-    at85_port_operation_t port_OC0B = {.non_pwm = AT85_NON_PWM_OFF};
-    AT85_TMR0_PWM_SetPortOperationMode(port_OC0A, port_OC0B);
-    
-    AT85_TMR0_SetCompareValue(5, AT85_TMR0_PORT_OC0A);
-
-    AT85_TMR0_SetClockSource(AT85_TMR0_CLK_IO_DIV_1024);
-
     // Configures the Ultrasonic sensor
-
     constexpr JSN::pin_config_t config {
         .echo    = AT85::GPIO::PORTB_2,
         .trigger = AT85::GPIO::PORTB_1 
     };
 
-    static_assert(sizeof(config) <= sizeof(uint16_t));
-    static_assert(period_us > 0.062f);
-
-    JSN::ValidatePins<config.echo,config.trigger>();
-
     JSN::ConfigSensorPins(config);
 
+    // Compile time checks
+    static_assert(sizeof(config) <= sizeof(uint16_t));
+    static_assert(period_us > 0.062f);
+    JSN::ValidatePins<config.echo,config.trigger>();
+
+    // 
     while(true)
     {
-        _delay_ms(10U);
         distance = JSN::ReadDistance(config);
-
-        bool pass_test = TestEqual(0.20f, distance, 0.02f);
-        if (pass_test)
-        {
-            AT85_TMR0_SetCompareValue(100, AT85_TMR0_PORT_OC0A);
-        }
-        AT85::GPIO::SetLevel(pass_test, AT85::GPIO::PORTB_3);
+        GPIO::ProduceAlertSignal(distance, AT85::GPIO::PORTB_3);
     }
 }
