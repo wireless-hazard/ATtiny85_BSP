@@ -82,34 +82,16 @@ namespace GPIO
 static void ProduceAlertSignal(float current_distance, AT85::GPIO::port_t port)
 {
     constexpr uint8_t delay_per_cycle{50};
-    uint8_t number_of_rounds{0};
+    uint8_t number_of_rounds{0U};
 
-    if ((current_distance >= 0) && (current_distance < 0.10))
+    if ((current_distance >= 0) && (current_distance < 0.25))
     {
-        number_of_rounds = 5; //
-    }
-    else if ((current_distance >= 0.10) && (current_distance < 0.15))
-    {
-        number_of_rounds = 10;
-    }
-    else if ((current_distance >= 0.15) && (current_distance < 0.20))
-    {
-        number_of_rounds = 15;
-    }
-    else if ((current_distance >= 0.20) && (current_distance < 0.25))
-    {
-        number_of_rounds = 20;
-    }
-    else
-    {
-        number_of_rounds = 25;
+        number_of_rounds = static_cast<uint8_t>(current_distance*100.0);
     }
 
-    AT85::GPIO::SetLevel(true, port);
-    for(uint8_t current_round = 0U; current_round < number_of_rounds; current_round++)
-    {
-        _delay_ms(delay_per_cycle);
-    }
+    // If number_of_rounds is equal to 0, does not generate the ON signal
+    AT85::GPIO::SetLevel(static_cast<bool>(number_of_rounds), port);
+    _delay_ms(100);
 
     AT85::GPIO::SetLevel(false, port);
     for(uint8_t current_round = 0U; current_round < number_of_rounds; current_round++)
