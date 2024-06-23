@@ -43,7 +43,8 @@ static inline void ConfigSensorPins(const pin_config_t& config)
     return distance;
 }
 
-[[nodiscard]] static inline float ReadDistance(const pin_config_t& config)
+template<bool use_timeout>
+[[nodiscard]] static inline float ReadDistance(const pin_config_t& config, uint16_t timeout = 0U)
 {
     using AT85::GPIO::SetLevel;
 
@@ -55,13 +56,34 @@ static inline void ConfigSensorPins(const pin_config_t& config)
     SetLevel(false, config.trigger);
 
     uint32_t counter{0U};
- 
-    while(!GetLevel(config.echo));
 
-    do
+    if constexpr(!use_timeout)
     {
-        counter++;
-    } while(GetLevel(config.echo));
+        while(!GetLevel(config.echo));
+
+        do
+        {
+            counter++;
+        } while(GetLevel(config.echo));
+    }
+    else //Use timeout
+    {
+        uint16_t timeout_counter{0U};
+
+        do
+        {
+            timeout_counter++;
+        }
+        while(!GetLevel(config.echo) && (timeout_counter <= timeout));
+
+        if (timeout_counter <= timeout)
+        {
+            do
+            {
+                counter++;
+            } while(GetLevel(config.echo) && (counter <= timeout));
+        }
+    }
 
     return ConvertDistance(counter);
 }
@@ -125,7 +147,7 @@ int main()
     // 
     while(true)
     {
-        distance = JSN::ReadDistance(config);
+        distance = JSN::ReadDistance<false>(config);
         GPIO::ProduceAlertSignal(distance, AT85::GPIO::PORTB_3);
     }
 }
