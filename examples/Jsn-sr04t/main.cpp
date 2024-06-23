@@ -10,6 +10,11 @@ static constexpr float period_us{1000000.0/float{F_CPU}};
 static constexpr float nano_seconds{1000000000.0f};
 static constexpr uint16_t uptime_counter_ratio{434}; // Measured value
 
+typedef enum : bool {
+    use_timeout = true,
+    no_timeout  = false 
+} timeout_usage_t;
+
 namespace JSN
 {
 
@@ -43,7 +48,7 @@ static inline void ConfigSensorPins(const pin_config_t& config)
     return distance;
 }
 
-template<bool use_timeout>
+template<timeout_usage_t timeout_choice>
 [[nodiscard]] static inline float ReadDistance(const pin_config_t& config, uint16_t timeout = 0U)
 {
     using AT85::GPIO::SetLevel;
@@ -57,16 +62,8 @@ template<bool use_timeout>
 
     uint32_t counter{0U};
 
-    if constexpr(!use_timeout)
-    {
-        while(!GetLevel(config.echo));
-
-        do
-        {
-            counter++;
-        } while(GetLevel(config.echo));
-    }
-    else //Use timeout
+    // In case the user decides, at compile time, to use a timeout
+    if constexpr(timeout_choice)
     {
         uint16_t timeout_counter{0U};
 
@@ -83,6 +80,15 @@ template<bool use_timeout>
                 counter++;
             } while(GetLevel(config.echo) && (counter <= timeout));
         }
+    }
+    else //No timeout, decided at compile time
+    {
+        while(!GetLevel(config.echo));
+
+        do
+        {
+            counter++;
+        } while(GetLevel(config.echo));
     }
 
     return ConvertDistance(counter);
@@ -147,7 +153,7 @@ int main()
     // 
     while(true)
     {
-        distance = JSN::ReadDistance<false>(config);
+        distance = JSN::ReadDistance<no_timeout>(config);
         GPIO::ProduceAlertSignal(distance, AT85::GPIO::PORTB_3);
     }
 }
