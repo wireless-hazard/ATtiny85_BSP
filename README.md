@@ -1,4 +1,4 @@
-# ATtiny85 Board Support Package
+# ATtiny85 Board Support Package in C++
 
 A simple board support package for the ATtiny85 Atmel 8-bit AVR Microcontroller
 
