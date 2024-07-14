@@ -75,4 +75,44 @@ To flash your program onto the microcontroller, run the script (from inside the 
 
 Then connect the microcontroller to your pc using a usb cable. In case it was connected already, remove it and reconnect it
 
-## Simulate (TBD)
+## Simulation
+
+You can simulate the Attiny 85 (and, by consequence, the examples here), using SimulAVR.
+The instructions can be found at: 
+
+https://www.nongnu.org/simulavr/build_simple.html
+
+In summary:
+```
+sudo apt install g++ make cmake git python3
+git clone https://git.savannah.nongnu.org/git/simulavr.git
+cd simulavr
+make build
+```
+
+Finally, copy the generated binary to your applications folder
+
+```
+sudo cp build/app/simulavr /usr/local/bin/
+```
+
+To visualize the results, gtkwave is going to be needed:
+```
+sudo apt install gtkwave
+```
+
+#### Setup SimulAVR python projects (TBD)
+
+### Simulate and show results
+
+Inside each example, you can find a **simulate** folder, which contains scripts to simulate and show the results of your example.
+
+To simulate (press Ctrl + C to finish the simulation):
+```
+./simulate.sh
+```
+
+To visualize the result:
+```
+./visualize_result.sh
+```

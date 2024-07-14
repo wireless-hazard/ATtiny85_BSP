@@ -1,7 +1,7 @@
 FREQ      = 16000000
 DEVICE    = attiny85
 SRC       = main.cpp
-TARGET    = app
+TARGET    = usi
 AVR_PATH  = /home/avr8-gnu-toolchain-linux_x86_64/bin
 
 all: $(SRC)

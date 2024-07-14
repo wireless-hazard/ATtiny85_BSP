@@ -4,21 +4,21 @@
 
 int main()
 {
-	using namespace AT85;
+    using namespace AT85;
 
-	GPIO::SetDirection(GPIO::OUTPUT, GPIO::PORTB_1); /*DO*/
-	GPIO::SetDirection(GPIO::OUTPUT, GPIO::PORTB_2); /*USCLK*/
+    GPIO::SetDirection(GPIO::OUTPUT, GPIO::PORTB_1); /*DO*/
+    GPIO::SetDirection(GPIO::OUTPUT, GPIO::PORTB_2); /*USCLK*/
 
     //No std::array :(
-	const uint8_t data[5U] = {200U, 100U, 3U, 22U, 8U};
+    const uint8_t data[5U] = {200U, 100U, 3U, 22U, 8U};
 
-	USI::SendDataRoutine(data, sizeof(data)/sizeof(uint8_t), USI::THREE_WIRE_MODE, USI::EXTERNAL_POSITIVE_EDGE);
+    USI::SendDataRoutine(data, sizeof(data)/sizeof(uint8_t), USI::THREE_WIRE_MODE, USI::EXTERNAL_POSITIVE_EDGE);
 
-	USI::ClearCounterOverflowFlag();
+    USI::ClearCounterOverflowFlag();
 
-	while(true)
-	{
-		_delay_ms(100);
-	}
+    while(true)
+    {
+        _delay_ms(100);
+    }
 
 }
