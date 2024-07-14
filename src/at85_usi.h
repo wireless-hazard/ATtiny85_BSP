@@ -3,159 +3,158 @@
 
 #include <avr/io.h>
 #include <stddef.h>
+#include "at85_sfr_defines.hpp"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef enum {
-	AT85_USI_DISABLED        = 0b00U,
-	AT85_USI_THREE_WIRE_MODE = 0b01U,
-	AT85_USI_TWO_WIRE_MODE_1 = 0b10U,
-	AT85_USI_TWO_WIRE_MODE_2 = 0b11U
-} at85_usi_wire_mode_t;
+namespace AT85::USI
+{
 
 typedef enum {
-	AT85_USI_SOFTWARE_CLOCK_STROBE    = 0b00U,
-	AT85_USI_TIMER_COUNTER0_CMP_MATCH = 0b01U,
-	AT85_USI_EXTERNAL_POSITIVE_EDGE   = 0b10U,
-	AT85_USI_EXTERNAL_NEGATIVE_EDGE   = 0b11U
-} at85_usi_clock_src_t;
+	DISABLED        = 0b00U,
+	THREE_WIRE_MODE = 0b01U,
+	TWO_WIRE_MODE_1 = 0b10U,
+	TWO_WIRE_MODE_2 = 0b11U
+} wire_mode_t;
 
-static inline void AT85_USI_SetDataToTransmit(uint8_t value)
+typedef enum {
+	SOFTWARE_CLOCK_STROBE    = 0b00U,
+	TIMER_COUNTER0_CMP_MATCH = 0b01U,
+	EXTERNAL_POSITIVE_EDGE   = 0b10U,
+	EXTERNAL_NEGATIVE_EDGE   = 0b11U
+} clock_src_t;
+
+static inline void SetDataToTransmit(uint8_t value)
 {
 	USIDR = value;
 }
 
-static inline uint8_t AT85_USI_GetReceivedData(void)
+static inline uint8_t GetReceivedData(void)
 {
 	return USIBR;
 }
 
-static inline void AT85_USI_SetStartConditionFlag(bool enable)
+static inline void SetStartConditionFlag(bool enable)
 {
-	USISR = ((uint8_t)enable << USISIF) | (USISR & 0b01101111U);
+	USISR = (static_cast<uint8_t>(enable) << USISIF) | (USISR & 0b01101111U);
 }
 
-static inline bool AT85_USI_GetStartConditionFlag(void)
+static inline bool GetStartConditionFlag(void)
 {
 	return (bool)((USISR >> USISIF) & 1U);
 }
 
-static inline void AT85_USI_ClearCounterOverflowFlag(void)
+static inline void ClearCounterOverflowFlag(void)
 {
 	USISR = (1U << USIOIF) | (USISR & 0b10101111U);
 }
 
-static inline bool AT85_USI_GetCounterOverflowFlag(void)
+static inline bool GetCounterOverflowFlag(void)
 {
 	return (bool)((USISR >> USIOIF) & 1U);
 }
 
-static inline void AT85_USI_SetStopConditionFlag(bool state)
+static inline void SetStopConditionFlag(bool state)
 {
-	USISR = ((uint8_t)state << USIPF) | (USISR & 0b11001111U);
+	USISR = (static_cast<uint8_t>(state) << USIPF) | (USISR & 0b11001111U);
 }
 
-static inline bool AT85_USI_GetStopConditionFlag(void)
+static inline bool GetStopConditionFlag(void)
 {
 	return (bool)((USISR >> USIPF) & 1U);
 }
 
-static inline bool AT85_USI_GetDataOutputCollisionFlag(void)
+static inline bool GetDataOutputCollisionFlag(void)
 {
 	return (bool)((USISR >> USIDC) & 1U);
 }
 
-static inline void AT85_USI_SetCounterValue(uint8_t value)
+static inline void SetCounterValue(uint8_t value)
 {
-	USISR = (value & 0b00001111U) | (USISR & 0b11100000U);
+	USISR = (value & USICNT_MSK) | (USISR & (~USICNT_MSK));
 }
 
-static inline uint8_t AT85_USI_GetCounterValue(void)
+static inline uint8_t GetCounterValue(void)
 {
-	return (USISR & 0b00001111U);
+	return (USISR & USICNT_MSK);
 }
 
-static inline void AT85_USI_EnableStartConditionInterrupt(bool enable)
+static inline void EnableStartConditionInterrupt(bool enable)
 {
-	USICR = ((uint8_t)enable << USISIE) | (USICR & 0b01111100U);
+	USICR = (static_cast<uint8_t>(enable) << USISIE) | (USICR & 0b01111100U);
 }
 
-static inline bool AT85_USI_GetStartConditionInterruptEnabled(void)
+static inline bool GetStartConditionInterruptEnabled(void)
 {
 	return (bool)((USICR >> USISIE) & 1U);
 }
 
-static inline void AT85_USI_EnableCounterOverflowInterrupt(bool enable)
+static inline void EnableCounterOverflowInterrupt(bool enable)
 {
-	USICR = ((uint8_t)enable << USIOIE) | (USICR & 0b10111100U);	
+	USICR = (static_cast<uint8_t>(enable) << USIOIE) | (USICR & 0b10111100U);	
 }
 
-static inline bool AT85_USI_GetCounterOverflowInterruptEnabled(void)
+static inline bool GetCounterOverflowInterruptEnabled(void)
 {
 	return (bool)((USICR >> USIOIE) & 1U);
 }
 
-static inline void AT85_USI_SetMode(at85_usi_wire_mode_t mode)
+static inline void SetMode(wire_mode_t mode)
 {
-	USICR = ((uint8_t)mode << USIWM0) | (USICR & 0b11001100U);
+	USICR = (static_cast<uint8_t>(mode) << USIWM0) | (USICR & 0b11001100U);
 }
 
-static inline at85_usi_wire_mode_t AT85_USI_GetMode(void)
+static inline wire_mode_t GetMode(void)
 {
-	return (at85_usi_wire_mode_t)((USICR >> USIWM0) & 0b11U);
+	return (wire_mode_t)((USICR >> USIWM0) & 0b11U);
 }
 
-static inline void AT85_USI_SetClockSource(at85_usi_clock_src_t clock)
+static inline void SetClockSource(clock_src_t clock)
 {
-	USICR = ((uint8_t)clock << USICS0) | (USICR & 0b11110000);
+	USICR = (static_cast<uint8_t>(clock) << USICS0) | (USICR & 0b11110000);
 }
 
-static inline at85_usi_clock_src_t AT85_USI_GetClockSource(void)
+static inline clock_src_t GetClockSource(void)
 {
-	return (at85_usi_clock_src_t)((USICR >> USICS0) & 0b11U);
+	return (clock_src_t)((USICR >> USICS0) & 0b11U);
 }
 
-static inline void AT85_USI_TriggerClockStrobe(void)
+static inline void TriggerClockStrobe(void)
 {
 	USICR = (1U << USICLK) | (USICR & 0b11111100U);
 }
 
-static inline void AT85_USI_ToggleClockPin(void)
+static inline void ToggleClockPin(void)
 {
 	USICR = (1U << USITC) | (USICR & 0b11111100U);
 }
 
 /*High Level API*/
 
-static inline void AT85_USI_PerformClockOperations(void)
+static inline void PerformClockOperations(void)
 {
 	USICR = (0b11U) | (USICR & 0b11111100U);
 }
 
-static inline void AT85_USI_SendDataRoutine(const uint8_t *data, size_t length, at85_usi_wire_mode_t mode, at85_usi_clock_src_t clock_src)
+static inline void SendDataRoutine(const uint8_t *data, size_t length, wire_mode_t mode, clock_src_t clock_src)
 {
-	if (data != NULL)
-	{
-		const uint8_t usicr_data = ((uint8_t)mode << USIWM0) |	((uint8_t)clock_src << USICS0) | (0b11U);
+	if (data != nullptr)
+    {
+        const uint8_t usicr_data = (static_cast<uint8_t>(mode)      << USIWM0) |	
+                                   (static_cast<uint8_t>(clock_src) << USICS0) | (0b11U);
 
-		for (size_t i = 0U; i < length; i++)
-		{
-			AT85_USI_SetDataToTransmit(data[i]);
-			AT85_USI_ClearCounterOverflowFlag();
-			AT85_USI_SetCounterValue(0U);
+        for (size_t i = 0U; i < length; i++)
+        {
+            SetDataToTransmit(data[i]);
+            ClearCounterOverflowFlag();
+            SetCounterValue(0U);
 
-			while(!AT85_USI_GetCounterOverflowFlag())
-			{
-				USICR = usicr_data;
-			}
-		}
-	}
+            while(!GetCounterOverflowFlag())
+            {
+                USICR = usicr_data;
+            }
+        }
+    }
 }
 
-#ifdef __cplusplus
-}
-#endif
+} //namespace AT85::USI
 
 #endif /*AT85_USI_H*/

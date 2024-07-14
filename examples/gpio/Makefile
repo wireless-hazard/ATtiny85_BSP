@@ -5,7 +5,7 @@ TARGET    = toggle
 AVR_PATH  = /home/avr8-gnu-toolchain-linux_x86_64/bin
 
 all: $(SRC)
-	$(AVR_PATH)/avr-g++ -g -O2 -fshort-enums -mmcu=$(DEVICE) -DF_CPU=$(FREQ) $(SRC) -o $(TARGET).elf
+	$(AVR_PATH)/avr-g++ -g -O2 -fshort-enums -std=c++1z -mmcu=$(DEVICE) -DF_CPU=$(FREQ) $(SRC) -o $(TARGET).elf
 	avr-objcopy -O ihex $(TARGET).elf $(TARGET).hex
 	avr-size --format=avr --mcu=$(DEVICE) $(TARGET).elf
 
