@@ -112,9 +112,9 @@ static void ProduceAlertSignal(float current_distance, AT85::GPIO::port_t port)
     constexpr uint8_t delay_per_cycle{50};
     uint8_t number_of_rounds{0U};
 
-    if ((current_distance >= 0) && (current_distance < 0.25))
+    if ((current_distance >= 0) && (current_distance < 0.99))
     {
-        number_of_rounds = static_cast<uint8_t>(current_distance*100.0);
+        number_of_rounds = static_cast<uint8_t>(current_distance*50.0);
     }
 
     // If number_of_rounds is equal to 0, does not generate the ON signal
